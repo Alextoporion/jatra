@@ -9,16 +9,19 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom';
 import router from './routes/Route';
+import AuthProvider from './authprovider/AuthProvider';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 // Create a client
 const queryClient = new QueryClient()
 root.render(
   <React.StrictMode>
+    <AuthProvider>
       <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-    
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </AuthProvider>
+
   </React.StrictMode>
 );
 

@@ -12,7 +12,6 @@ const storage =new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'jatra_profiles',
-        allowed_formats: ['jpg', 'png', 'jpeg'],
     },
 })
 const fileUploader = multer({storage });
