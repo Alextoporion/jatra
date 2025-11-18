@@ -1,5 +1,5 @@
 // Make sure all imports are correct
-const { itemPurchase, purchaseList } = require('../controllers/PurchaseController');
+const { itemPurchase, purchaseList, deletePurchase, updatePurchase } = require('../controllers/PurchaseController');
 const fileUploader = require('../middlewares/FileUploader');
 const verifyToken = require('../middlewares/verifyToken');
 
@@ -11,5 +11,10 @@ router.post('/purchase', verifyToken, fileUploader.single('itemImage'), itemPurc
 // This route should also be protected.
 // Anyone logged in can see the list.
 router.get('/purchased-item', verifyToken, purchaseList); 
+// ---------- DELETE PURCHASED ITEM ----------
+router.delete('/delete-purchase/:id', verifyToken, deletePurchase);
+// The Route
+router.put('/update-purchase/:id',verifyToken,fileUploader.single('itemImage'),updatePurchase              
+);
 
 module.exports = router;

@@ -92,7 +92,83 @@ const purchaseList = async (req, res) => {
     }
 };
 
+const deletePurchase = async (req, res) => {
+    try{
+        const { id } = req.params;
+        const userId = req.user?.id || req.user?._id;
+
+        if (!userId) {
+            return res.status(403).json({ message: "Forbidden: No user token provided." });
+        }
+        const deletedPurchase = await PurchaseModel.findByIdAndDelete(id);
+        if(!deletedPurchase){
+            return res.status(404).json({ message: "Purchase item not found." });
+        }
+        res.status(200).json({ message: "Purchase item deleted successfully.", data: deletedPurchase });
+    }catch(error){
+        console.error("Error in deletePurchase controller:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+const updatePurchase = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user?.id || req.user?._id;
+
+    if (!userId) {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+
+    try {
+        const item = await PurchaseModel.findById(id);
+        if (!item) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+
+        // 1. Extract data. 
+        // IMPORTANT: In Frontend we used formData.append("quantityInStock", ...) 
+        // so we MUST extract 'quantityInStock' here.
+        const { name, unit, quantityInStock, pricePerUnit, supplier } = req.body;
+
+        console.log("Received for update:", req.body); // <--- DEBUGGING LOG
+
+        // 2. Update fields
+        if (name) item.name = name;
+        if (unit) item.unit = unit;
+        if (supplier) item.supplier = supplier;
+
+        // 3. Handle Numbers (Convert String to Number)
+        // We check if it is NOT undefined, because 0 is a valid stock.
+        if (quantityInStock !== undefined && quantityInStock !== "undefined") {
+             item.quantityInStock = Number(quantityInStock);
+        }
+        
+        if (pricePerUnit !== undefined && pricePerUnit !== "undefined") {
+             item.pricePerUnit = Number(pricePerUnit);
+        }
+
+        // 4. Handle Image
+        if (req.file) {
+            item.itemImage = req.file.path;
+        }
+
+        const updatedItem = await item.save();
+
+        res.status(200).json({
+            message: "Item updated successfully",
+            data: updatedItem
+        });
+
+    } catch (error) {
+        console.error("Error updating purchase:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
 module.exports = {
     itemPurchase,
-    purchaseList
+    purchaseList,
+    deletePurchase,
+    updatePurchase
 };
