@@ -2,7 +2,7 @@ import React from "react";
 
 const AdminHome = () => {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm">
+    <div className="bg-white p-6 rounded-2xl shadow-sm overflow-hidden">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">
         Welcome Back, Admin 👋
       </h2>

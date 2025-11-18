@@ -6,6 +6,7 @@ import AdminHome from "../adminPages/AdminHome";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import PurchaseItem from "../adminPages/PurchaseItem";
+import PurchaseList from "../adminPages/PurchaseList";
 
 const router = createBrowserRouter([
     {
@@ -22,7 +23,8 @@ const router = createBrowserRouter([
         element:<Dashboard />,
         children:[
             {path:'',element:<AdminHome/>},
-            {path:'purchase-item',element:<PurchaseItem/>}
+            {path:'purchase-item',element:<PurchaseItem/>},
+            {path:'inventory',element:<PurchaseList/>},
         ]
     }
 ]);

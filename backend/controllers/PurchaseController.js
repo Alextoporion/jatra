@@ -1,40 +1,98 @@
-const PurchaseModel = require("../models/PurchaseModel");
+const PurchaseModel = require('../models/PurchaseModel'); // Adjust path as needed
 
+/**
+ * @description Add a new ingredient purchase or update stock for an existing one
+ */
 const itemPurchase = async (req, res) => {
+    const userId = req.user?.id || req.user?._id;
+    console.log('see user id', userId)
+
+    if (!userId) {
+        return res.status(403).json({ message: "Forbidden: No user token provided." });
+    }
+
+    const { name, unit, quantity, pricePerUnit, supplier } = req.body;
+    const itemImage = req.file ? req.file.path : null;
+
+    if (!name || !unit || !quantity || !pricePerUnit || !supplier) {
+        return res.status(400).json({ message: "Please fill all required fields." });
+    }
+
     try {
-        // The user ID must be assigned to the variable *before* you can use it
-        const createdBy = req.user.id; // Assuming user ID is available in req.user
+        // Check if ingredient already exists
+        let ingredient = await PurchaseModel.findOne({ name: name });
 
-        // These console logs are now in the correct order
-        console.log("USER:", req.user);
-        console.log("CREATED BY:", createdBy);
+        if (ingredient) {
+            // ---------- UPDATE EXISTING INGREDIENT ----------
 
-        const purchaseData = req.body;
-        const itemImage = req.file ? req.file.path : null;
+            // SAFETY FIX: Prevent undefined stock on old items
+            ingredient.quantityInStock = (ingredient.quantityInStock || 0) + Number(quantity);
 
-        // Create the new purchase object
-        // We explicitly convert number fields, as 'multipart/form-data' sends them as strings
-        const newPurchase = new PurchaseModel({
-            ...purchaseData,
-            quantity: Number(purchaseData.quantity), // Explicitly cast to Number
-            pricePerUnit: Number(purchaseData.pricePerUnit), // Explicitly cast to Number
-            itemImage,
-            createdBy
+            // Update purchase quantity for the current purchase event
+            ingredient.quantity = Number(quantity);
+
+            // Update other fields
+            ingredient.pricePerUnit = pricePerUnit;
+            ingredient.supplier = supplier;
+            ingredient.purchaseDate = Date.now();
+            ingredient.itemImage = itemImage || ingredient.itemImage;
+
+            // Last updated by user
+            ingredient.createdBy = userId;
+
+        } else {
+            // ---------- CREATE NEW INGREDIENT ----------
+            ingredient = new PurchaseModel({
+                name,
+                unit,
+                quantity: Number(quantity),           // amount purchased now
+                quantityInStock: Number(quantity),    // initial stock
+                pricePerUnit,
+                supplier,
+                itemImage,
+                createdBy: userId,
+                purchaseDate: Date.now()
+            });
+        }
+
+        const savedIngredient = await ingredient.save();
+
+        res.status(201).json({
+            message: "Purchase successful",
+            data: savedIngredient
         });
 
-        // Save the new purchase to the database
-        await newPurchase.save();
-
-        // Send a success response
-        res.status(201).json({ message: "Purchase recorded successfully", data: newPurchase });
-
     } catch (error) {
-        // Log the actual error on the server for debugging
         console.error("Error in itemPurchase controller:", error);
 
-        // Send a generic 500 error to the client
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "An ingredient with this name already exists."
+            });
+        }
+
         res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
 
-module.exports = { itemPurchase };
+/**
+ * @description Get all purchased items
+ */
+const purchaseList = async (req, res) => {
+    try {
+        const purchases = await PurchaseModel.find()
+            .populate('createdBy', 'username email')
+            .sort({ quantityInStock: 1 }); // smallest stock first
+
+        res.status(200).json({ data: purchases });
+
+    } catch (error) {
+        console.error("Error in purchaseList controller:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+module.exports = {
+    itemPurchase,
+    purchaseList
+};
