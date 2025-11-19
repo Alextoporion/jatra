@@ -7,6 +7,8 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import PurchaseItem from "../adminPages/PurchaseItem";
 import PurchaseList from "../adminPages/PurchaseList";
+import AddProduction from "../adminPages/AddProduction";
+import FinishedStock from "../adminPages/FinishedStock";
 
 const router = createBrowserRouter([
     {
@@ -25,6 +27,8 @@ const router = createBrowserRouter([
             {path:'',element:<AdminHome/>},
             {path:'purchase-item',element:<PurchaseItem/>},
             {path:'inventory',element:<PurchaseList/>},
+            {path:'make-item',element:<AddProduction/>},
+            {path:'ice-cream-stock',element:<FinishedStock/>},
         ]
     }
 ]);
