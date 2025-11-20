@@ -53,7 +53,7 @@ export default function FinishedStock() {
                                 </div>
                                 <h2 className="text-xl font-bold text-gray-800">{item.name}</h2>
                                 <p className="text-gray-400 text-xs uppercase tracking-wider font-semibold mt-1">
-                                    Selling Price: ₹{item.price || 0}
+                                    Selling Price: tk.{item.price || 0}
                                 </p>
 
                                 <div className="mt-6 flex items-end justify-between border-t pt-4">

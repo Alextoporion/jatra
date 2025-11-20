@@ -9,6 +9,7 @@ import PurchaseItem from "../adminPages/PurchaseItem";
 import PurchaseList from "../adminPages/PurchaseList";
 import AddProduction from "../adminPages/AddProduction";
 import FinishedStock from "../adminPages/FinishedStock";
+import POS from "../adminPages/POS";
 
 const router = createBrowserRouter([
     {
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
             {path:'inventory',element:<PurchaseList/>},
             {path:'make-item',element:<AddProduction/>},
             {path:'ice-cream-stock',element:<FinishedStock/>},
+            {path:'pos',element:<POS/>},
         ]
     }
 ]);

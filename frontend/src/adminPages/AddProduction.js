@@ -5,65 +5,62 @@ import { motion } from 'framer-motion';
 export default function AddProduction() {
     const axiosSecure = UseAxiosSecure();
     
-    // 1. Store the list of available ingredients from DB
     const [inventory, setInventory] = useState([]);
 
-    // 2. Form State
+    // Form State
     const [productName, setProductName] = useState('');
     const [producedQuantity, setProducedQuantity] = useState('');
     const [unit, setUnit] = useState('Cups');
     
-    // 3. Dynamic Ingredient List (The Recipe)
-    // We start with one empty row
+    // --- NEW: Selling Price State ---
+    const [sellingPrice, setSellingPrice] = useState(''); 
+    
+    // Dynamic Ingredient List
     const [recipeItems, setRecipeItems] = useState([
         { ingredientId: '', quantityUsed: '' } 
     ]);
 
-    // --- Fetch Inventory on Load ---
     useEffect(() => {
         axiosSecure.get('/purchased-item')
             .then(res => setInventory(res.data.data))
             .catch(err => console.error(err));
     }, [axiosSecure]);
 
-    // --- Helper: Add a new ingredient row ---
     const addRow = () => {
         setRecipeItems([...recipeItems, { ingredientId: '', quantityUsed: '' }]);
     };
 
-    // --- Helper: Remove a row ---
     const removeRow = (index) => {
         const list = [...recipeItems];
         list.splice(index, 1);
         setRecipeItems(list);
     };
 
-    // --- Helper: Handle Input Change for Ingredients ---
     const handleIngredientChange = (index, field, value) => {
         const list = [...recipeItems];
         list[index][field] = value;
         setRecipeItems(list);
     };
 
-    // --- Submit to Backend ---
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Format data for backend
         const payload = {
             productName,
             producedQuantity,
             unit,
+            sellingPrice, // --- NEW: Send price to backend ---
             ingredientsUsed: recipeItems
         };
 
         try {
             const res = await axiosSecure.post('/add-production', payload);
             if(res.status === 201){
-                alert('Production Added & Stock Adjusted!');
+                alert('Production Added & Price Updated!');
                 // Reset form
                 setProductName('');
                 setProducedQuantity('');
+                setSellingPrice(''); // Reset price
                 setRecipeItems([{ ingredientId: '', quantityUsed: '' }]);
             }
         } catch (error) {
@@ -92,9 +89,9 @@ export default function AddProduction() {
                         required
                     />
 
-                    <div className="flex gap-3">
-                        <div className="w-2/3">
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Quantity Made</label>
+                    <div className="flex gap-3 mb-4">
+                        <div className="w-1/2">
+                            <label className="block text-sm font-bold text-gray-600 mb-2">Qty Made</label>
                             <input 
                                 type="number" 
                                 placeholder="10"
@@ -104,7 +101,7 @@ export default function AddProduction() {
                                 required
                             />
                         </div>
-                        <div className="w-1/3">
+                        <div className="w-1/2">
                             <label className="block text-sm font-bold text-gray-600 mb-2">Unit</label>
                             <select 
                                 className="w-full p-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-pink-400 outline-none"
@@ -114,8 +111,23 @@ export default function AddProduction() {
                                 <option>Cups</option>
                                 <option>Tubs</option>
                                 <option>Liters</option>
+                                <option>Cones</option>
                             </select>
                         </div>
+                    </div>
+
+                    {/* --- NEW: SELLING PRICE FIELD --- */}
+                    <div>
+                        <label className="block text-sm font-bold text-green-600 mb-2">Selling Price (Per Unit)</label>
+                        <input 
+                            type="number" 
+                            placeholder="e.g. 150"
+                            className="w-full p-3 rounded-xl bg-green-50 border border-green-100 focus:ring-2 focus:ring-green-400 outline-none text-green-800 font-bold"
+                            value={sellingPrice}
+                            onChange={e => setSellingPrice(e.target.value)}
+                            required
+                        />
+                        <p className="text-xs text-gray-400 mt-1">This will update the price in the POS system.</p>
                     </div>
                 </div>
 
@@ -127,11 +139,10 @@ export default function AddProduction() {
                         onClick={addRow}
                         className="text-xs bg-pink-100 text-pink-600 px-3 py-1.5 rounded-full font-bold"
                     >
-                        + Add Another
+                        + Add Ingredient
                     </button>
                 </div>
 
-                {/* Dynamic List of Ingredients */}
                 {recipeItems.map((item, index) => (
                     <motion.div 
                         initial={{ opacity: 0, y: 10 }}
@@ -139,7 +150,6 @@ export default function AddProduction() {
                         key={index} 
                         className="bg-white p-4 rounded-2xl shadow-md border-l-4 border-pink-500 relative"
                     >
-                        {/* Remove Button (X) */}
                         {recipeItems.length > 1 && (
                             <button 
                                 type="button"
@@ -151,7 +161,6 @@ export default function AddProduction() {
                         )}
 
                         <div className="grid grid-cols-1 gap-3">
-                            {/* Select Ingredient */}
                             <div>
                                 <label className="text-xs text-gray-400 font-semibold uppercase">Select Ingredient</label>
                                 <select 
@@ -169,12 +178,11 @@ export default function AddProduction() {
                                 </select>
                             </div>
 
-                            {/* Quantity Used */}
                             <div>
                                 <label className="text-xs text-gray-400 font-semibold uppercase">Quantity Used</label>
                                 <input 
                                     type="number"
-                                    placeholder="How much used?"
+                                    placeholder="Qty"
                                     className="w-full mt-1 p-2 bg-gray-50 rounded-lg outline-none border border-gray-200"
                                     value={item.quantityUsed}
                                     onChange={(e) => handleIngredientChange(index, 'quantityUsed', e.target.value)}
@@ -185,12 +193,11 @@ export default function AddProduction() {
                     </motion.div>
                 ))}
 
-                {/* --- SUBMIT BUTTON --- */}
                 <button 
                     type="submit"
                     className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-pink-500/30 mt-6 active:scale-95 transition-transform"
                 >
-                    🚀 Produce Batch
+                    🚀 Produce & Update Price
                 </button>
 
             </form>

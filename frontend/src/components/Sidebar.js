@@ -1,6 +1,8 @@
 import React from "react";
 import { Home, BarChart2, Settings, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { FaIceCream } from "react-icons/fa";
+import { SiPopos } from "react-icons/si";
 
 const Sidebar = ({ isOpen }) => {
   return (
@@ -13,14 +15,20 @@ const Sidebar = ({ isOpen }) => {
           <Link className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
             <Home size={18} /> Dashboard
           </Link>
-          <Link className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
-            <Users size={18} /> Users
+          <Link to={'/admin/purchase-item'} className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
+            <Users size={18} /> Purchase
           </Link>
-          <Link className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
-            <BarChart2 size={18} /> Analytics
+          <Link to={'/admin/inventory'} className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
+            <BarChart2 size={18} /> Inventory
           </Link>
-          <Link className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
-            <Settings size={18} /> Settings
+          <Link to={'/admin/make-item'} className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
+            <Settings size={18} /> Manufacturing
+          </Link>
+          <Link to={'/admin/ice-cream-stock'} className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
+            <FaIceCream size={18} /> Ice Cream Stock
+          </Link>
+          <Link to={'/admin/pos'} className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
+            <SiPopos size={18} /> POS
           </Link>
         </nav>
       </div>
