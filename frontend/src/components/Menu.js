@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Menu as MenuIcon, X, LogOut, IceCream } from "lucide-react";
+import { Menu as MenuIcon, X, LogOut, IceCream, LayoutDashboard } from "lucide-react"; // Added LayoutDashboard icon
 import { AuthContext } from "../authprovider/AuthProvider";
 import { Link } from "react-router-dom";
 
@@ -82,6 +82,18 @@ const Menu = () => {
                 </Link>
               </li>
             ))}
+
+            {/* --- CONDITION: Show Dashboard if Authenticated (Desktop) --- */}
+            {isAuthenticated && (
+              <li>
+                <Link
+                  to="/admin" // Change this to '/admin' if needed
+                  className="px-5 py-2 rounded-full text-sm font-body font-bold text-orange-600 bg-orange-50 hover:bg-orange-500 hover:text-white hover:shadow-sm transition-all duration-300 block flex items-center gap-2"
+                >
+                  Dashboard
+                </Link>
+              </li>
+            )}
           </ul>
 
           {/* Right Side: Auth & Mobile Toggle */}
@@ -156,6 +168,27 @@ const Menu = () => {
                 </Link>
               </li>
             ))}
+
+            {/* --- CONDITION: Show Dashboard if Authenticated (Mobile) --- */}
+            {isAuthenticated && (
+               <li 
+                  className="w-full text-center"
+                  style={{ 
+                    transition: 'all 0.5s ease', 
+                    transitionDelay: `${navLinks.length * 100}ms`, // Delay based on list length
+                    transform: isOpen ? 'translateY(0)' : 'translateY(20px)',
+                    opacity: isOpen ? 1 : 0
+                  }}
+              >
+                <Link
+                  to="/admin" 
+                  onClick={() => setIsOpen(false)}
+                  className="block w-full text-2xl font-funky text-orange-600 bg-orange-50 hover:bg-orange-100 py-3 rounded-2xl transition-colors flex items-center justify-center gap-2"
+                >
+                  <LayoutDashboard size={20} /> Dashboard
+                </Link>
+              </li>
+            )}
           </ul>
 
           {/* Mobile Auth Button */}
@@ -181,6 +214,7 @@ const Menu = () => {
                 </button>
               </Link>
             )}
+
           </div>
         </div>
       </div>

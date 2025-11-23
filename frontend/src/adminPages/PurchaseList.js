@@ -145,7 +145,7 @@ export default function PurchaseList() {
                   </td>
                   <td className="hidden md:table-cell p-3">{item.unit}</td>
                   <td className="p-2 md:p-3 text-green-600 font-bold">{item.quantityInStock}</td>
-                  <td className="p-2 md:p-3">₹{item.pricePerUnit}</td>
+                  <td className="p-2 md:p-3">{item.pricePerUnit} Tk</td>
                   <td className="hidden md:table-cell p-3">{item.supplier}</td>
                   <td className="p-2 md:p-3 text-center">
                     <div className="flex flex-col md:flex-row gap-1 md:gap-2 justify-center items-center">
