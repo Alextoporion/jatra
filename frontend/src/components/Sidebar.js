@@ -3,6 +3,7 @@ import { Home, BarChart2, Settings, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FaIceCream } from "react-icons/fa";
 import { SiPopos } from "react-icons/si";
+import { FcSalesPerformance } from "react-icons/fc";
 
 const Sidebar = ({ isOpen }) => {
   return (
@@ -29,6 +30,9 @@ const Sidebar = ({ isOpen }) => {
           </Link>
           <Link to={'/admin/pos'} className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
             <SiPopos size={18} /> POS
+          </Link>
+          <Link to={'/admin/sales-history'} className="flex items-center gap-2 p-2 hover:bg-orange-50 rounded-lg">
+            <FcSalesPerformance size={18} /> Sales History
           </Link>
         </nav>
       </div>
