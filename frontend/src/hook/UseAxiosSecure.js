@@ -3,6 +3,7 @@ import axios from 'axios';
 const UseAxiosSecure = () => {
     const axiosSecure = axios.create({
         baseURL: 'https://jatra-kn8y.vercel.app/api',
+        // baseURL: 'http://localhost:8080/api',
     })
 
     // Add a request interceptor
