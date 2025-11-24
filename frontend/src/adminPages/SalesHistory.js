@@ -70,6 +70,7 @@ export default function SalesHistory() {
                 <div className="max-w-4xl mx-auto">
                     <h1 className="text-xl md:text-3xl font-bold mb-6 flex items-center gap-2">
                         <span className="md:hidden">📈</span> Sales Report
+                        
                     </h1>
 
                     {/* Summary Cards Grid */}

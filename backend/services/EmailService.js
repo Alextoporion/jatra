@@ -9,8 +9,17 @@ const transporter =nodeMailer.createTransport({
 })
 const sendEmail = async (to, subject, text) => {
     try{
+        const mailOptions= {
+            from:`your email service <${process.env.EMAIL_USER}>`,
+            to:to,
+            subject:subject,
+            html:html
 
+        }
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent: " + info.response);
     }catch(err){
         console.error("Error sending email", err);
     }
 }
+module.exports = {sendEmail};
