@@ -6,6 +6,7 @@ export default function SalesHistory() {
     const axiosSecure = UseAxiosSecure();
     const [sales, setSales] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [reportLoading, setReportLoading] = useState(false); // New state for button loading
     
     // Summary States
     const [totalRevenue, setTotalRevenue] = useState(0);
@@ -34,7 +35,7 @@ export default function SalesHistory() {
         const revenue = data.reduce((acc, curr) => acc + (curr.grandTotal || 0), 0);
         setTotalRevenue(revenue);
 
-        // 2. Total Profit (Handle undefined profit for old sales)
+        // 2. Total Profit
         const profit = data.reduce((acc, curr) => acc + (curr.totalProfit || 0), 0);
         setTotalProfit(profit);
 
@@ -48,14 +49,30 @@ export default function SalesHistory() {
         setTodaysRevenue(todayTotal);
     };
 
-    // Helper: Time format (e.g., "2:30 PM")
+    // --- NEW: Handle Close Day Report ---
+    const handleCloseDay = async () => {
+        if(!window.confirm("Are you sure you want to close the day and email the report?")) return;
+
+        try {
+            setReportLoading(true);
+            const res = await axiosSecure.post('/submit-daily-report');
+            if(res.status === 200){
+                alert("✅ Report Sent Successfully!");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("❌ Failed to send report.");
+        } finally {
+            setReportLoading(false);
+        }
+    };
+
     const formatTime = (dateString) => {
         return new Date(dateString).toLocaleTimeString('en-US', {
             hour: 'numeric', minute: '2-digit'
         });
     };
 
-    // Helper: Date format (e.g., "Nov 24")
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             month: 'short', day: 'numeric'
@@ -68,10 +85,27 @@ export default function SalesHistory() {
             {/* --- MOBILE HEADER & SUMMARY (App Like) --- */}
             <div className="bg-blue-600 text-white p-6 pt-8 rounded-b-[2.5rem] shadow-xl md:rounded-none md:bg-transparent md:text-gray-800 md:shadow-none md:pt-4">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-xl md:text-3xl font-bold mb-6 flex items-center gap-2">
-                        <span className="md:hidden">📈</span> Sales Report
-                        
-                    </h1>
+                    
+                    {/* Header Row with Button */}
+                    <div className="flex justify-between items-start mb-6">
+                        <h1 className="text-xl md:text-3xl font-bold flex items-center gap-2">
+                            <span className="md:hidden">📈</span> Sales Report
+                        </h1>
+
+                        {/* --- THE NEW BUTTON --- */}
+                        <button 
+                            onClick={handleCloseDay}
+                            disabled={reportLoading}
+                            className="bg-white/20 hover:bg-white/30 active:scale-95 text-white md:bg-gray-900 md:text-white text-xs font-bold px-4 py-2 rounded-xl backdrop-blur-sm border border-white/20 shadow-lg transition-all flex items-center gap-2 disabled:opacity-50"
+                        >
+                            {reportLoading ? (
+                                <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                            ) : (
+                                <span>📩</span>
+                            )}
+                            {reportLoading ? "Sending..." : "Send Report"}
+                        </button>
+                    </div>
 
                     {/* Summary Cards Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
@@ -123,7 +157,7 @@ export default function SalesHistory() {
                                 {/* Left: Icon & Date */}
                                 <div className="flex items-center gap-3 md:gap-4">
                                     <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-bold shrink-0
-                                        tk.{sale.paymentMethod === 'Cash' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}`}>
+                                        ${sale.paymentMethod === 'Cash' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}`}>
                                         {sale.paymentMethod === 'Cash' ? '💵' : '💳'}
                                     </div>
                                     <div>
@@ -133,7 +167,6 @@ export default function SalesHistory() {
                                         <p className="text-xs text-gray-400">
                                             {formatDate(sale.createdAt)} • {formatTime(sale.createdAt)}
                                         </p>
-                                        {/* Mobile Item Count */}
                                         <p className="text-[10px] text-gray-500 mt-0.5 md:hidden">
                                             {sale.items.length} Items Sold
                                         </p>
@@ -147,7 +180,7 @@ export default function SalesHistory() {
                                     </p>
                                     {sale.totalProfit > 0 ? (
                                         <p className="text-[10px] md:text-xs font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded inline-block mt-1">
-                                            Profit: ₹{sale.totalProfit.toFixed(0)}
+                                            Profit: tk.{sale.totalProfit.toFixed(0)}
                                         </p>
                                     ) : (
                                         <p className="text-[10px] text-gray-300 mt-1">Old Data</p>

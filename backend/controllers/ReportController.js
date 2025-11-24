@@ -1,5 +1,6 @@
 const SalesModel = require('../models/SalesModel');
-const { sendEmail } = require('../utils/emailService'); // Adjust path to where your transporter code is
+const { sendEmail } = require('../services/EmailService');
+
 
 const submitDailyReport = async (req, res) => {
     try {
@@ -85,7 +86,7 @@ const submitDailyReport = async (req, res) => {
 
         // 5. Send the Email
         // Replace with the actual Owner/Manager email address
-        const ownerEmail = "owner@example.com"; 
+        const ownerEmail = "alexberman357@gmail.com"; 
         
         await sendEmail(ownerEmail, `End of Day Report - ${dateString}`, emailHtml);
 

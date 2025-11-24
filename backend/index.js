@@ -8,6 +8,7 @@ const PurchaseRoute = require('./routes/PurchaseRoute');
 const ProductionRoute = require('./routes/ProductionRoute');
 const SalesRoute = require('./routes/SalesRoute');
 const DashboardRoute= require('./routes/DashboardRoute');
+const ReportRoute= require('./routes/ReportRoute');
 const port = process.env.PORT || 8080;
 
 app.use(cors());
@@ -17,6 +18,7 @@ app.use('/api', PurchaseRoute);
 app.use('/api', ProductionRoute);
 app.use('/api', SalesRoute);
 app.use('/api', DashboardRoute);
+app.use('/api', ReportRoute);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
